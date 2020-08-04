@@ -3,7 +3,7 @@ import board
 
 from adafruit_bus_device.i2c_device import I2CDevice
 
-from wing import Wing
+from .wing import Wing
 
 # Models
 MODEL_02BA = 0

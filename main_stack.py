@@ -32,7 +32,7 @@ previous_time = time.monotonic()
 tick = 1.0
 
 def startup():
-    radio.send_string("Initialization successful.")
+    radio.send_string("Stack.")
     print("Initialization successful.")
 
 def next_tick():

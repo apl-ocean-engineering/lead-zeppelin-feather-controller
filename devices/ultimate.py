@@ -6,7 +6,7 @@ import busio
 
 import adafruit_gps
 
-from wing import Wing
+from .wing import Wing
 
 class GPS(Wing):
 

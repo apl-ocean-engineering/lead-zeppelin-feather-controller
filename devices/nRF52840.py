@@ -14,7 +14,7 @@ import adafruit_lis3mdl
 import adafruit_lsm6ds
 import adafruit_sht31d
 
-from wing import Wing
+from .wing import Wing
 
 class nRF52840(Wing):
     def __init__(self):

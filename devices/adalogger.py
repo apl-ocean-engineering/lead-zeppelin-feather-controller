@@ -9,7 +9,7 @@ import storage
 import adafruit_pcf8523
 import adafruit_sdcard
 
-from wing import Wing
+from .importwing import Wing
 
 class RTC(Wing):
     def __init__(self):

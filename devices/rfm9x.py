@@ -6,7 +6,7 @@ import digitalio
 
 import adafruit_rfm9x
 
-from wing import Wing
+from .wing import Wing
 
 class RFM9x(Wing):
     def __init__(self, frequency=433.0, cs_pin=board.D9, reset_pin=board.D5):
@@ -24,17 +24,20 @@ class RFM9x(Wing):
     def send_string(self, string):
         self.send(bytes(string, "utf-8"))
 
-    def receive(self, duration=0.5):
-        return self.rfm9x.receive(duration)
+    def receive(self, timeout=0.5):
+        return self.rfm9x.receive(timeout=timeout)
 
-    def receive_string(self, duration):
-        return str(self.receive(duration), "ascii")
+    def receive_string(self, timeout=0.5):
+        response = self.receive(timeout=timeout)
+        if response is None:
+            return None
+        return str(response, "ascii")
 
     def last_rssi(self):
         return self.rfm9x.last_rssi
 
     def receive_handshake(self):
-        packet = self.receive(1)
+        packet = self.receive(timeout=1)
         if packet is None or len(packet) !=2 or packet[0] != 0:
             return False
 
@@ -42,17 +45,17 @@ class RFM9x(Wing):
         b = random.randint(0,254)
         self.send(bytes([a+1, b]))
 
-        packet = self.receive(1)
+        packet = self.receive(timeout=1)
         if packet is None or len(packet) !=2 or packet[0] != b+1:
             return False
 
         return True
 
-    def handshake(self):
+    def send_handshake(self):
         a = random.randint(0,254)
         self.send(bytes([0,a]))
         
-        packet = self.receive(1)
+        packet = self.receive(timeout=1)
         if packet is None or len(packet) !=2 or packet[0] != a+1:
             return False
 
@@ -63,4 +66,4 @@ class RFM9x(Wing):
         return True
 
     def test(self):
-        return self.handshake()
+        return self.send_handshake()

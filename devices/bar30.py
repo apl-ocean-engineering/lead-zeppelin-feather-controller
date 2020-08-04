@@ -1,7 +1,7 @@
 import io
 
-from wing import Wing
-from ms5837 import MS5837_30BA
+from .wing import Wing
+from .ms5837 import MS5837_30BA
 
 class Bar30(Wing):
     def __init__(self):
