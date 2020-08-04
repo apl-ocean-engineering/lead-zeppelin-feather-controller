@@ -1,4 +1,6 @@
 import time
+import io
+
 import board
 import busio
 
@@ -52,3 +54,35 @@ class GPS(Wing):
 
     def height_geoid(self):
         return self.gps.height_geoid
+
+    def refresh(self):
+        self.update()
+
+    def record(self):
+        with io.StringIO() as output:
+            timestamp_utc = self.timestamp_utc()
+            output.write(
+                "GPS Time: {}/{}/{} {:02}:{:02}:{:02}.\n".format(
+                    timestamp_utc.tm_mday,  # Grab parts of the time from the
+                    timestamp_utc.tm_mon,  # struct_time object that holds
+                    timestamp_utc.tm_year,  # the fix time.  Note you might
+                    timestamp_utc.tm_hour,  # not get all data like year, day,
+                    timestamp_utc.tm_min,  # month!
+                    timestamp_utc.tm_sec,
+                )
+            )
+
+            output.write("Fix: {}.\n".format(self.has_fix()))
+
+            output.write("Latitude: {} degrees.\n".format(self.latitude()))
+            output.write("Longitude: {} degrees.\n".format(self.longitude()))
+            output.write("Fix quality: {}.\n".format(self.fix_quality()))
+
+            output.write("# satellites: {}.\n".format(self.satellites()))
+            output.write("Altitude: {} meters.\n".format(self.altitude_m()))
+            output.write("Speed: {} knots.\n".format(self.speed_knots()))
+            output.write("Track angle: {} degrees.\n".format(self.track_angle_deg()))
+            output.write("Horizontal dilution: {}.\n".format(self.horizontal_dilution()))
+            output.write("Height geo ID: {} meters.\n".format(self.height_geoid()))
+
+            return output.getvalue()

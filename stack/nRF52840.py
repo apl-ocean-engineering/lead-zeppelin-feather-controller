@@ -1,7 +1,8 @@
-"""Sensor demo for Adafruit Feather Sense. Prints data from each of the sensors."""
+import io
 import time
 import array
 import math
+
 import board
 import audiobusio
 import digitalio
@@ -84,6 +85,21 @@ class nRF52840(Wing):
         samples = array.array('H', [0] * 160)
         self.microphone.record(samples, len(samples))
         return normalized_rms(samples)
+
+    def record(self):
+        with io.StringIO() as output:
+            output.write("Proximity: {}.\n".format(self.proximity()))
+            output.write("Red: {}, Green: {}, Blue: {}, Clear: {}.\n".format(*self.color_data()))
+            output.write("Temperature: {} C.\n".format(self.temperature()))
+            output.write("Barometric pressure: {}.\n".format(self.pressure()))
+            output.write("Altitude: {:.1f} m.\n".format(self.altitude()))
+            output.write("Magnetic: {} {} {} uTesla.\n".format(*self.magnetic()))
+            output.write("Acceleration: {} {} {} m/s^2.\n".format(*self.acceleration()))
+            output.write("Gyro: {} {} {} dps.\n".format(*self.gyro()))
+            output.write("Humidity: {}%.\n".format(self.relative_humidity()))
+            output.write("Sound level: {}.\n".format(self.sound()))
+
+            return output.getvalue()
 
 def normalized_rms(values):
     minbuf = int(sum(values) / len(values))

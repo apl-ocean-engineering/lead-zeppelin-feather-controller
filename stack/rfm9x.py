@@ -14,7 +14,7 @@ class RFM9x(Wing):
 
         self.spi = Wing.spi
         self.rfm9x = adafruit_rfm9x.RFM9x(self.spi, self.cs, self.reset, self.frequency)
-        self.rfm9x.tx_power = 23
+        self.rfm9x.tx_power = 13
 
     def send(self, data):
         self.rfm9x.send(data)

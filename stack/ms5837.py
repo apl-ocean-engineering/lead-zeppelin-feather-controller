@@ -75,8 +75,6 @@ class MS5837(Wing):
         # Wait for reset to complete
         sleep(0.01)
         
-        self._C = []
-        
         # Read calibration values and CRC
         for i in range(7):
             self.i2c_write(self._MS5837_PROM_READ+i*2)
