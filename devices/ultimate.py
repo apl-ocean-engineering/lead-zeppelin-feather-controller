@@ -11,8 +11,7 @@ from .wing import Wing
 class GPS(Wing):
 
     def __init__(self):
-        self.uart = busio.UART(board.TX, board.RX, baudrate=9600, timeout=10)
-        self.gps = adafruit_gps.GPS(self.uart, debug=False)
+        self.gps = adafruit_gps.GPS(Wing.uart, debug=False)
         self.gps.send_command(b"PMTK314,0,1,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0") # initialize
         self.gps.send_command(b"PMTK220,1000")
 
@@ -59,6 +58,9 @@ class GPS(Wing):
         self.update()
 
     def test(self):
+        current = time.time()
+        while not self.has_fix() and time.time()-current<1.0:
+            self.update()
         return self.has_fix()
 
     def record(self):

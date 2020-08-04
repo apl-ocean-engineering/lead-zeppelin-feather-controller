@@ -36,7 +36,10 @@ UNITS_Centigrade = 1
 UNITS_Farenheit  = 2
 UNITS_Kelvin     = 3
 
-    
+# adapted to circuitpython for the bar30 depth/pressure sensor
+# https://github.com/bluerobotics/ms5837-python/blob/master/ms5837.py
+# https://github.com/bluerobotics/BlueRobotics_MS5837_Library/blob/master/MS5837.cpp
+
 class MS5837(Wing):
     
     # Registers

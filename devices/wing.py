@@ -2,7 +2,7 @@ import board
 import busio
 
 class Wing:
-    uart = board.UART()
+    uart = busio.UART(board.TX, board.RX, baudrate=9600, timeout=10)
     spi = busio.SPI(board.SCK, board.MOSI, board.MISO)
     try:
         i2c = board.I2C()

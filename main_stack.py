@@ -3,11 +3,11 @@ import array
 import math
 import board
 
-from nRF52840 import nRF52840 
-from adalogger import RTC, SDCard 
-from ultimate import GPS 
-from rfm9x import RFM9x 
-from bar30 import Bar30 
+from devices.nRF52840 import nRF52840 
+from devices.adalogger import RTC, SDCard 
+from devices.ultimate import GPS 
+from devices.rfm9x import RFM9x 
+from devices.bar30 import Bar30 
 
 sense = nRF52840()
 clock = RTC()
@@ -16,13 +16,13 @@ gps = GPS()
 radio = RFM9x()
 pressure = Bar30()
 
-boards = []
-boards.append(sense)
-boards.append(clock)
-boards.append(card)
-boards.append(gps)
-boards.append(radio)
-boards.append(pressure)
+devices = []
+devices.append(sense)
+devices.append(clock)
+devices.append(card)
+devices.append(gps)
+devices.append(radio)
+devices.append(pressure)
 
 logging = False
 button_status = False
@@ -32,7 +32,8 @@ previous_time = time.monotonic()
 tick = 1.0
 
 def startup():
-    radio.send_string("Stack.")
+    for device in devices:
+        assert device.test()
     print("Initialization successful.")
 
 def next_tick():
@@ -66,9 +67,9 @@ def tick_update():
 
     print("Recording")
     sense.red(True) # turn on LED to indicate we're writing to the file
-    for board in boards:
-        board.refresh()
-        info = board.record()
+    for device in devices:
+        device.refresh()
+        info = device.record()
         print(info)
         card.write(info)
     sense.red(False)  # turn off LED to indicate we're done
