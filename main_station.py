@@ -15,9 +15,8 @@ previous_time = time.monotonic()
 tick = 1.0
 
 def startup():
-    while not radio.receive_handshake():
+    while not radio.receive():
         print("Waiting.")
-    radio.send_string("Station.")
     print("Initialization successful.")
 
 def next_tick():
@@ -33,7 +32,7 @@ def loop_update():
     pass
 
 def tick_update():
-    string = radio.receive_string()
+    string = radio.receive()
     print(string)
 
 startup()

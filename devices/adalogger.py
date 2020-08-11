@@ -21,7 +21,7 @@ class RTC(Wing):
     def datetime(self): # tm_mday, tm_mon, tm_year, tm_hour, tm_min, tm_sec
         return self.rtc.datetime
 
-    def record(self):
+    def string(self):
         with io.StringIO() as output:
             t = self.datetime()
             output.write("RTC Time: {}/{}/{} {:02}:{:02}:{:02}.\n".format(

@@ -1,15 +1,17 @@
 import time
-import array
 import math
+import array
+import sys
 import board
 
-from devices.nRF52840 import nRF52840 
+from devices.nRF52840 import Sense, BLE 
 from devices.adalogger import RTC, SDCard 
 from devices.ultimate import GPS 
 from devices.rfm9x import RFM9x 
 from devices.bar30 import Bar30 
 
-sense = nRF52840()
+sense = Sense()
+ble = BLE()
 clock = RTC()
 card = SDCard()
 gps = GPS()
@@ -18,6 +20,7 @@ pressure = Bar30()
 
 devices = []
 devices.append(sense)
+devices.append(ble)
 devices.append(clock)
 devices.append(card)
 devices.append(gps)
@@ -32,8 +35,23 @@ previous_time = time.monotonic()
 tick = 1.0
 
 def startup():
-    for device in devices:
-        assert device.test()
+    print("Initalizing.")
+    success = False
+    device_success = [False for device in devices]
+    while not success:
+        success = True
+        for i in range(len(devices)):
+            if device_success[i]:
+                continue
+            
+            device = devices[i]
+            try:
+                assert device.test()
+                device_success[i]=True
+            except Exception:
+                print("Test failed for device {} (index {}).".format(device, i))
+                success = False
+        time.sleep(tick)
     print("Initialization successful.")
 
 def next_tick():
@@ -65,12 +83,19 @@ def tick_update():
     print("Fix: {}".format(gps.has_fix()))
     radio.send_string("{}, {}, {}".format(gps.has_fix(),gps.latitude(),gps.longitude()))
 
+    num = ble.in_waiting()
+    print("Bluetooth {} bytes available.".format(num))
+    read = ble.read(num)
+    print(read)
+    print(str(read, "ascii"))
+    ble.write(read)
+
     print("Recording")
     sense.red(True) # turn on LED to indicate we're writing to the file
     for device in devices:
         device.refresh()
-        info = device.record()
-        print(info)
+        info = device.string()
+        # print(info)
         card.write(info)
     sense.red(False)  # turn off LED to indicate we're done
     print("Close")

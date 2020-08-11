@@ -14,9 +14,13 @@ import adafruit_lis3mdl
 import adafruit_lsm6ds
 import adafruit_sht31d
 
+from adafruit_ble import BLERadio
+from adafruit_ble.advertising.standard import ProvideServicesAdvertisement
+from adafruit_ble.services.nordic import UARTService
+
 from .wing import Wing
 
-class nRF52840(Wing):
+class Sense(Wing):
     def __init__(self):
         self.i2c = Wing.i2c
 
@@ -86,7 +90,7 @@ class nRF52840(Wing):
         self.microphone.record(samples, len(samples))
         return normalized_rms(samples)
 
-    def record(self):
+    def string(self):
         with io.StringIO() as output:
             output.write("Proximity: {}.\n".format(self.proximity()))
             output.write("Red: {}, Green: {}, Blue: {}, Clear: {}.\n".format(*self.color_data()))
@@ -106,3 +110,33 @@ def normalized_rms(values):
     return int(math.sqrt(sum(float(sample - minbuf) *
                             (sample - minbuf) for sample in values) / len(values)))
 
+class BLE(Wing):
+    def __init__(self):
+        self.ble = BLERadio()
+        self.uart = UARTService()
+        self.advertisement = ProvideServicesAdvertisement(self.uart)
+        self.ble.start_advertising(self.advertisement)
+
+    def connected(self):
+        return self.ble.connected
+
+    def in_waiting(self):
+        return self.uart.in_waiting
+
+    def read(self, nbytes=None):
+        return self.uart.read(nbytes)
+
+    def read_string(self, nbytes=None):
+        response = self.read(nbytes=nbytes)
+        if response is None:
+            return None
+        return str(response, "ascii")
+
+    def write(self, data):
+        self.uart.write(data)
+
+    def write_string(self, string):
+        self.write(bytes(string))
+
+    def test(self):
+        return self.connected()

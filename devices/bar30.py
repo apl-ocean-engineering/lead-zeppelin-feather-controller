@@ -29,7 +29,7 @@ class Bar30(Wing):
     def refresh(self):
         self.read()
 
-    def record(self):
+    def string(self):
         with io.StringIO() as output:
             output.write("Pressure: {} mbar.\n".format(self.pressure()))
             output.write("Temperature: {} deg C.\n".format(self.temperature()))

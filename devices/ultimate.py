@@ -54,7 +54,7 @@ class GPS(Wing):
     def height_geoid(self):
         return self.gps.height_geoid
 
-    def refresh(self):
+    def tick(self):
         self.update()
 
     def test(self):
@@ -63,7 +63,7 @@ class GPS(Wing):
             self.update()
         return self.has_fix()
 
-    def record(self):
+    def string(self):
         with io.StringIO() as output:
             timestamp_utc = self.timestamp_utc()
             output.write(

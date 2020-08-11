@@ -10,11 +10,14 @@ class Wing:
         print("No i2c!")
     filepath = "/log.txt"
 
-    def refresh(self):
+    def loop(self):
+        pass
+
+    def tick(self):
         pass
 
     def test(self):
         return True
 
-    def record(self):
+    def string(self):
         return ""

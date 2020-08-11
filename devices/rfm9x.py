@@ -25,7 +25,10 @@ class RFM9x(Wing):
         self.send(bytes(string, "utf-8"))
 
     def receive(self, timeout=0.5):
-        return self.rfm9x.receive(timeout=timeout)
+        data = self.rfm9x.receive(timeout=timeout)
+        if data is not None and data[0]==0:
+            return self.return_handshake(data)
+        return data
 
     def receive_string(self, timeout=0.5):
         response = self.receive(timeout=timeout)
@@ -36,11 +39,9 @@ class RFM9x(Wing):
     def last_rssi(self):
         return self.rfm9x.last_rssi
 
-    def receive_handshake(self):
-        packet = self.receive(timeout=1)
+    def return_handshake(self, packet):
         if packet is None or len(packet) !=2 or packet[0] != 0:
             return False
-
         a = packet[1]
         b = random.randint(0,254)
         self.send(bytes([a+1, b]))
