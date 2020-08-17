@@ -8,6 +8,10 @@ import adafruit_rfm9x
 
 from .wing import Wing
 
+# for the Adafruit LoRa Radio FeatherWing - RFM95W 433 MHz
+# https://learn.adafruit.com/radio-featherwing/
+
+# primarily one way communcations from the stack to the station
 class RFM9x(Wing):
     def __init__(self, frequency=433.0, cs_pin=board.D9, reset_pin=board.D5):
         self.frequency = frequency
@@ -24,6 +28,7 @@ class RFM9x(Wing):
     def send_string(self, string):
         self.send(bytes(string, "utf-8"))
 
+    # if a handshake is received unexpectedly, completes the handshake
     def receive(self, timeout=0.5):
         data = self.rfm9x.receive(timeout=timeout)
         if data is not None and data[0]==0:
@@ -39,6 +44,7 @@ class RFM9x(Wing):
     def last_rssi(self):
         return self.rfm9x.last_rssi
 
+    # used by the station to receive a handshake when expected
     def return_handshake(self, packet):
         if packet is None or len(packet) !=2 or packet[0] != 0:
             return False
@@ -52,6 +58,7 @@ class RFM9x(Wing):
 
         return True
 
+    # used by the stack to send a handshake to ensure communications
     def send_handshake(self):
         a = random.randint(0,254)
         self.send(bytes([0,a]))

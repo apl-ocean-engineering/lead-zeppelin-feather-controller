@@ -6,6 +6,8 @@ import board
 
 import redirect
 
+# looks at another file for the settings and tasks
+# allows different setups to use different settings and tasks if necessary
 reference = __import__(redirect.reference)
 
 previous_time = time.monotonic()
@@ -14,13 +16,15 @@ def startup():
     print("Initalizing.")
     success = False
     device_success = {device_name:False for device_name in reference.devices}
+
+    # loops through all devices until their tests are all successful
+    
     while not success:
         print("Loop.")
         success = True
         for device_name, device in reference.devices.items():
             if device_success[device_name]:
                 continue
-            
             try:
                 assert device.test()
                 device_success[device_name]=True
@@ -32,7 +36,7 @@ def startup():
         time.sleep(reference.tick)
     print("Initialization successful.")
 
-def next_tick(): 
+def next_tick(): # determines whether or not the next tick has arrived
     global previous_time
     current_time = time.monotonic()
     if current_time - previous_time < reference.tick:
@@ -42,47 +46,54 @@ def next_tick():
         return True
 
 def loop_update():
+    # refreshes all devices
     for device in reference.devices.values():
         device.loop()
 
     check_mode()
-    run_mode = reference.mode
-        
-    for command in reference.commands[reference.mode]:
+    run_mode = reference.mode # separate variable in case the mode is changed midway
+    
+    # runs all tasks
+    for task in reference.tasks[run_mode]:
         try:
-            command.loop()
+            task.loop()
         except Exception as e:
             sys.print_exception(e)
-            print("Failed executing loop function for command {} in mode {}.".format(command, run_mode))
+            print("Failed executing loop function for task {} in mode {}.".format(task, run_mode))
 
-    clear_commands()
+    expire_tasks()
 
 def tick_update():
     print("Tick at time {}.".format(time.monotonic()))
     print("Mode {}.".format(reference.mode))
+
+    # refreshes all devices
     for device in reference.devices.values():
         device.tick()
 
     check_mode()
-    run_mode = reference.mode
+    run_mode = reference.mode # separate variable in case the mode is changed midway
         
-    for command in reference.commands[reference.mode]:
+    # runs all tasks
+    for task in reference.tasks[reference.mode]:
         try:
-            command.tick()
+            task.tick()
         except Exception as e:
             sys.print_exception(e)
-            print("Failed executing tick function for command {} in mode {}.".format(command, run_mode))
+            print("Failed executing tick function for command {} in mode {}.".format(task, run_mode))
 
-    clear_commands()
+    expire_tasks()
 
-def check_mode():
-    if not reference.mode in reference.commands:
+def check_mode(): # makes sure the current mode is actually valid
+    if not reference.mode in reference.tasks:
         print("Invalid mode; resetting to default mode {}.".format(reference.default_mode))
-        reference.mode=reference.default_mode
+        reference.mode = reference.default_mode
 
-def clear_commands():
-    for mode_commands in reference.commands.values():
-        mode_commands = [x for x in mode_commands if x.core() or not x.expired()]
+def expire_tasks(): # removes all expired tasks from the list 
+    for mode_tasks in reference.tasks.values():
+        for i in reversed(range(len(mode_tasks))): # reversed to prevent index problems
+            if mode_tasks[i].expired():
+                mode_tasks.pop(i).finish() # allows expired tasks to finish up
 
 startup()
 while True:

@@ -5,6 +5,12 @@ import board
 
 from devices.rfm9x import RFM9x 
 
+# left over code for the station, not updated because the current code works fine
+# will constantly print out any radio messages received (and also receive any handshakes)
+# used for testing the radio
+
+# station uses an Adafruit Feather M0 Adalogger and an Adafruit LoRa Radio FeatherWing - RFM95W 433 MHz
+
 radio = RFM9x()
 
 logging = False

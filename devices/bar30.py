@@ -3,11 +3,15 @@ import io
 from .wing import Wing
 from .ms5837 import MS5837_30BA
 
+# for the Bar30 High-Resolution 300m Depth/Pressure Sensor
+# https://bluerobotics.com/store/sensors-sonars-cameras/sensors/bar30-sensor-r1/
+
 class Bar30(Wing):
     def __init__(self):
         self.sensor = MS5837_30BA()
         assert self.sensor.init()
 
+    # sensors need to be updated each time prior to receiving data
     def read(self):
         self.sensor.read()
 

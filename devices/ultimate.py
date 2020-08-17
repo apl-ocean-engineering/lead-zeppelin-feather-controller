@@ -8,13 +8,17 @@ import adafruit_gps
 
 from .wing import Wing
 
+# for the Adafruit Ultimate GPS FeatherWing
+# https://learn.adafruit.com/adafruit-ultimate-gps-featherwing
+
 class GPS(Wing):
 
     def __init__(self):
         self.gps = adafruit_gps.GPS(Wing.uart, debug=False)
-        self.gps.send_command(b"PMTK314,0,1,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0") # initialize
-        self.gps.send_command(b"PMTK220,1000")
+        self.gps.send_command(b"PMTK314,0,1,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0") # initialize with basic parameters
+        self.gps.send_command(b"PMTK220,500") # sets update rate in ms
 
+    # according to the guide, needs to be run twice as fast as data arrives
     def update(self):
         self.gps.update()
 

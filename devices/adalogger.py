@@ -11,6 +11,9 @@ import adafruit_sdcard
 
 from .wing import Wing
 
+# for the Adafruit Adalogger FeatherWing
+# https://learn.adafruit.com/adafruit-adalogger-featherwing/
+
 class RTC(Wing):
     def __init__(self):
         self.rtc = adafruit_pcf8523.PCF8523(Wing.i2c)
@@ -36,9 +39,9 @@ class SDCard(Wing):
         self.spi = Wing.spi
         self.sdcard = adafruit_sdcard.SDCard(self.spi, self.cs)
         self.vfs = storage.VfsFat(self.sdcard)
-        storage.mount(self.vfs, self.mount)
+        storage.mount(self.vfs, self.mount) # mounts card under the specified folder
 
-    def write(self, string, filepath = Wing.filepath, mode = 'a'):
+    def write(self, string, filepath = Wing.filepath, mode = 'a'): # filepath needs to have '/' at the front
         with open(self.mount+filepath, mode) as f:
             f.write(string)
 

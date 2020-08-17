@@ -20,6 +20,9 @@ from adafruit_ble.services.nordic import UARTService
 
 from .wing import Wing
 
+# for the Adafruit Feather nRF52840 Sense
+# https://learn.adafruit.com/adafruit-feather-sense
+
 class Sense(Wing):
     def __init__(self):
         self.i2c = Wing.i2c
@@ -110,6 +113,7 @@ def normalized_rms(values):
     return int(math.sqrt(sum(float(sample - minbuf) *
                             (sample - minbuf) for sample in values) / len(values)))
 
+# used for two way close range communication 
 class BLE(Wing):
     def __init__(self):
         self.ble = BLERadio()
@@ -123,6 +127,7 @@ class BLE(Wing):
     def in_waiting(self):
         return self.uart.in_waiting
 
+    # presumably is best effort?
     def read(self, nbytes=None):
         return self.uart.read(nbytes)
 
